@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const LayoutAuth = () => {
-  const { role } = useAuthContext();
+  // const { role } = useAuthContext();
+  const  role  = "USER";
   const router = useRouter();
 
   useEffect(() => {

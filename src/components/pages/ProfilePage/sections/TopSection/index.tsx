@@ -19,14 +19,14 @@ const TopSection = () => {
       <StyledAlignFlex gap="20px">
         <ProfileActiveAvatar />
         <article>
-          <h1>Wasim A.</h1>
+          <h1>Husam M.</h1>
           <div>
             <LocationOnIcon sx={{ color: "gray" }} fontSize="small" />
             <p>Gaza, Palestinian Territories – 3:55 pm local time</p>
           </div>
           <StyledAlignFlex gap="3px">
             <StyledAlignFlex gap="4px" className="available">
-              <BoltIcon sx={{ color: "gray", fontSize: "18px" }} />
+              <BoltIcon sx={{ color: "gray",fontSize: "18px" }} />
               <p>Available now</p>
             </StyledAlignFlex>
             <span>off</span>

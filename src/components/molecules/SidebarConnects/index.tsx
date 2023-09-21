@@ -10,15 +10,15 @@ import useAuth from "@/hook/useAuth";
 
 const SidebarConnects = () => {
   const { user } = useAuth();
-  
+
   return (
     <StyledSidebarConnects>
       <section className="title">
         <Link href={PATHS.PROFILE}>
           <img src="/assets/account-image.jpg" alt="account-image" />
         </Link>
-        {/* <Link href={PATHS.PROFILE}>Wasim A.</Link> */}
-        <Link href={PATHS.PROFILE}>{user?.name}</Link>
+        <Link href={PATHS.PROFILE}>Husam M.</Link>
+        {/* <Link href={PATHS.PROFILE}>{user?.name}</Link> */}
         <p>Front-End Developer</p>
       </section>
       <section className="completeness">
@@ -31,7 +31,7 @@ const SidebarConnects = () => {
           <section className="box">
             <p>Add your past work so clients know you’re a pro (+%).</p>
             <Link href="#">Add work</Link>
-            <IconButton sx={{ color: "white", backgroundColor: "green" }}>
+            <IconButton sx={{ color: "white",backgroundColor: "green" }}>
               <KeyboardArrowRightIcon />
             </IconButton>
           </section>
