@@ -1,12 +1,12 @@
 import { OutlinedInput } from "@mui/material";
-import { StyledAlignFlex, StyledBetweenAlignFlex } from "@/style/common";
+import { StyledAlignFlex,StyledBetweenAlignFlex } from "@/style/common";
 import HelpIcon from "@mui/icons-material/Help";
 import { StyledHoursPerWeekDialog } from "./style.js";
 import EditIcon from "@mui/icons-material/Edit";
 import LinkIcon from "@mui/icons-material/Link";
 import ToolButton from "@/components/atoms/ToolButton";
-import { Button, Dialog, DialogActions } from "@mui/material";
-import React, { useState } from "react";
+import { Button,Dialog,DialogActions } from "@mui/material";
+import React,{ ChangeEvent,useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   StyledDialog,
@@ -14,15 +14,38 @@ import {
 } from "@/components/organism/Dialog/style.js";
 
 const HoursPerWeekDialog = () => {
-  const [open, setOpen] = useState(false);
+  const [open,setOpen] = useState(false);
   const openToggle = () => {
     setOpen(!open);
   };
+  const [hourRate,setHourRate] = useState<number>(25);
+  const [recieve,setRecieve] = useState<number>(hourRate - 5);
+  const [hourRateFinal,setHourRateFinal] = useState<number>(25);
+  // const [recieveFinal,setRecieveFinal] = useState<number>(hourRate - 5);
 
+  // Function to handle changes in the "hourRate" input
+  const handleHourRateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newHourRate = parseFloat(event.target.value);
+    setHourRate(newHourRate);
+    setRecieve(newHourRate - 5);
+  };
+
+  // Function to handle changes in the "receive" input
+  const handleReceiveChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newReceive = parseFloat(event.target.value);
+    setRecieve(newReceive);
+    setHourRate(newReceive + 5);
+  };
+  const handleSaveValue = () => {
+    if (hourRate > 0) {
+      setHourRateFinal(hourRate);
+      openToggle();
+    }
+  }
   return (
     <div>
       <StyledAlignFlex gap="10px">
-        <h3>$ 25.00/hr</h3>
+        <h3>$ {hourRateFinal}.00/hr</h3>
         <ToolButton>
           <EditIcon fontSize="small" onClick={() => openToggle()} />
         </ToolButton>
@@ -69,7 +92,8 @@ const HoursPerWeekDialog = () => {
                 className="rate__input"
                 autoFocus
                 inputProps={{ className: "rate__input" }}
-                defaultValue={"25.00"}
+                value={hourRate}
+                onChange={handleHourRateChange}
               />
               <span>/hr</span>
             </StyledAlignFlex>
@@ -97,7 +121,7 @@ const HoursPerWeekDialog = () => {
                 <p>
                   The estimated amount you&rsquo;ll receive after service fees
                 </p>
-                <HelpIcon sx={{ color: "var(--dark-color)", fontSize: 16 }} />
+                <HelpIcon sx={{ color: "var(--dark-color)",fontSize: 16 }} />
               </StyledAlignFlex>
             </div>
             <StyledAlignFlex gap="4px">
@@ -106,7 +130,8 @@ const HoursPerWeekDialog = () => {
                 className="rate__input"
                 autoFocus={false}
                 inputProps={{ className: "rate__input" }}
-                defaultValue={"25.00"}
+                value={`${recieve}.00`}
+                onChange={handleReceiveChange}
               />
               <span>/hr</span>
             </StyledAlignFlex>
@@ -119,7 +144,7 @@ const HoursPerWeekDialog = () => {
               <Button onClick={() => openToggle()} variant="contained">
                 Cancel
               </Button>
-              <Button onClick={() => {}} variant="contained">
+              <Button onClick={handleSaveValue} variant="contained">
                 Save
               </Button>
             </StyledAlignFlex>

@@ -38,7 +38,6 @@ export default function SwipeableTemporaryDrawer() {
       </StyledJobsList>
       {(["right"] as const).map((anchor) => (
         <React.Fragment key={anchor}>
-          <Button onClick={toggleDrawer(anchor, true)}>{anchor}</Button>
           <StyledDrawer
             anchor={anchor}
             open={state[anchor]}

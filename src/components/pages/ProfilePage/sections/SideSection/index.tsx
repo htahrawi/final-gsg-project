@@ -39,7 +39,7 @@ const SideSection = () => {
           <p className="major">
             Bachelor of Computer Science (BCompSc), Software Development
             <br />
-            <span>2019-2024 (expected)</span>
+            <span>2019-2023</span>
           </p>
         </SidebarControlProfile>
       </SidebarControlProfile>
