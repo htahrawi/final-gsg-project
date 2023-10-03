@@ -60,7 +60,7 @@ export const formSchema = Yup.object({
 
 const SignUpForm = () => {
   const [showPass, setShowPass] = useState(false);
-  const { handleAUTHENTICATE, isLoading } = useAuthContext();
+  const { signup, isLoading } = useAuthContext();
 
   const {
     register,
@@ -73,7 +73,7 @@ const SignUpForm = () => {
 
 
   const onSubmit = async (data: SignUpFormData) => {
-    handleAUTHENTICATE(data);
+    signup(data);
     reset();
   };
 

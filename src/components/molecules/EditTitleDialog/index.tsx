@@ -3,14 +3,14 @@ import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import Input from "@/components/atoms/Input";
 import { StyledEditTitleDialog } from "./style.js";
-import { StyledAlignFlex, StyledBetweenAlignFlex } from "@/style/common";
+import { StyledAlignFlex,StyledBetweenAlignFlex } from "@/style/common";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import SidebarControlProfile from "@/components/atoms/SidebarControlProfile";
 import {
   StyledDialog,
   dialogStyle,
 } from "@/components/organism/Dialog/style.js";
-import { Button, Dialog, DialogActions } from "@mui/material";
+import { Button,Dialog,DialogActions } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
 
@@ -23,7 +23,9 @@ export const formSchema = Yup.object({
 });
 
 const EditTitleDialog = () => {
-  const [open, setOpen] = useState(false);
+  const [open,setOpen] = useState(false);
+  const [title,setTitle] = useState<string>("")
+  const [titleFinal,setTitleFinal] = useState<string>("Front-End Developer")
   const openToggle = () => {
     setOpen(!open);
   };
@@ -36,16 +38,27 @@ const EditTitleDialog = () => {
   } = useForm<titleProps>({
     resolver: yupResolver(formSchema),
   });
-
+  const handleChangeTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const title = event.target.value;
+    setTitle(title);
+    // openToggle();
+  }
+  const handleSaveTitle = () => {
+    if (title.length > 5) {
+      setTitleFinal(title);
+      openToggle();
+    }
+  }
   const onSubmit = async (data: titleProps) => {
-    // login(data);
-    reset();
+    // // login(data);
+    // console.log("asfadfadf");
+    // reset();
   };
 
   return (
     <div>
       <SidebarControlProfile
-        text="Front-End Developer"
+        text={titleFinal}
         editIcon
         onEditClicked={() => openToggle()}
       />
@@ -71,14 +84,16 @@ const EditTitleDialog = () => {
             <Input
               type="text"
               placeholder="Example: Web Application Developer"
+              defaultValue={titleFinal}
               name="title"
               imageHidden
-              // register={register}
+              onChange={handleChangeTitle}
+            // register={register}
             />
             {errors.title && (
               <StyledAlignFlex gap="8px" margin="5px 0 0 0">
                 <ErrorOutlineIcon
-                  sx={{ color: "var(--danger-color)", fontSize: 16 }}
+                  sx={{ color: "var(--danger-color)",fontSize: 16 }}
                 />
                 <p className="error">{errors.title.message}</p>
               </StyledAlignFlex>
@@ -91,7 +106,7 @@ const EditTitleDialog = () => {
               <Button onClick={() => openToggle()} variant="contained">
                 Cancel
               </Button>
-              <Button onClick={() => {}} variant="contained">
+              <Button onClick={handleSaveTitle} variant="contained">
                 Save
               </Button>
             </StyledAlignFlex>

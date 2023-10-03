@@ -7,7 +7,7 @@ import * as React from "react";
 import { ReactElement } from "react";
 import { styled as myStyled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
-import Menu, { MenuProps } from "@mui/material/Menu";
+import Menu,{ MenuProps } from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Link from "next/link";
@@ -15,14 +15,17 @@ import styled from "styled-components";
 
 const StyledHeaderOption = styled(Button)`
   background: transparent;
-  color: var(--dark-color);
+  /* background-color: red; */
+  color: #000;
   padding: 0;
   text-transform: capitalize;
   font-size: 14px;
   font-weight: 600;
+  /* color:var(--primary-color) */
 
   &:hover {
     color: var(--primary-color);
+    /* color: red; */
     background: transparent;
   }
 `;
@@ -70,8 +73,8 @@ const StyledMenu = myStyled((props: MenuProps) => (
   },
 }));
 
-export default function CustomizedMenus({ defaultValue, options }: Array) {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+export default function CustomizedMenus({ defaultValue,options }: Array) {
+  const [anchorEl,setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -87,10 +90,11 @@ export default function CustomizedMenus({ defaultValue, options }: Array) {
         aria-controls={open ? "demo-customized-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
-        variant="contained"
+        // variant="contained"
         disableElevation
         onClick={handleClick}
         endIcon={<KeyboardArrowDownIcon />}
+        style={{ color: '#000',textTransform: 'capitalize' }}
       >
         {defaultValue}
       </StyledHeaderOption>

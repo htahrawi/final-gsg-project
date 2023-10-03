@@ -1,77 +1,90 @@
 import { useReducer } from "react";
-import axios from "axios";
 import { ROLES } from "@/constants";
-import { AUTH_ACTIONS } from "@/constants/auth";
-// export const API_URL = "http://localhost:3003/";
-export const AUTH_API_URL = "https://react-tt-api.onrender.com/api/";
+import axios from "axios";
+import { AUTH_API_URL } from "@/config/api";
+import { AUTH_ACTIONS,AUTH_API_PATHS } from "@/constants/auth";
+import Swal from "sweetalert2";
+import { useRouter } from 'next/navigation'; // Corrected import statement
+import { PATHS } from "@/constants/path";
 
-// const AUTH_ACTIONS = {
-//   AUTHENTICATE: "AUTHENTICATE",
-//   LOGOUT: "LOGOUT",
-//   SET_LOADING: "SET_LOADING",
-//   SET_ERROR: "SET_ERROR",
-//   ALERT: "showAuthAlert",
-// };
-
-const getToken = () => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("token") || null;
-  }
+// Define the types for your state
+type AuthState = {
+  isAuth: boolean;
+  user: null | Record<string,any>;
+  token: string;
+  role: string;
+  isLoading: boolean;
+  error: null | string;
 };
 
-const getRole = () => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("role") || ROLES.GUEST;
-  }
-};
+// Define the action types
+const enum REDUCER_ACTION_TYEP {
+  SET_LOADING,
+  AUTHORIZE,
+  LOGOUT,
+  SET_ERROR,
+}
 
-const INIT_STATE = {
-  user: null,
-  isAuth: false,
+type ReducerAction = {
+  type: REDUCER_ACTION_TYEP,
+  payload: string,
+}
+
+const getisAuth = (): boolean => localStorage.getItem("isAuth") === "true" || false;
+const getUser = (): null | Record<string,any> => JSON.parse(localStorage.getItem("user")) || null;
+const getToken = (): string => localStorage.getItem("token") || ''; // Provide a default empty string
+const getRole = (): string => localStorage.getItem("role") || ROLES.GUEST;
+
+const initialState: AuthState = {
+  isAuth: getisAuth(),
+  user: getUser(),
   token: getToken(),
   role: getRole(),
-  error: null,
   isLoading: false,
-  showAuthAlert: false,
+  error: null,
 };
 
-const authReducer = (state: any, action: any) => {
-  const checkRole = () => (action.payload.isAdmin ? ROLES.ADMIN : ROLES.USER);
+const reduce = (state: typeof initialState,action: ReducerAction): typeof initialState => {
   switch (action.type) {
-    case AUTH_ACTIONS.SET_LOADING:
-      return { ...state, isLoading: true };
-
-    case AUTH_ACTIONS.SET_ERROR:
+    case REDUCER_ACTION_TYEP.SET_LOADING:
       return {
         ...state,
-        error: action.payload,
-        isLoading: false,
+        isLoading: true,
       };
 
-    case AUTH_ACTIONS.AUTHORIZE:
-      const token = action.payload.token || state.token || getToken();
-      const role = checkRole();
-      localStorage.setItem("role", role);
-      localStorage.setItem("token", token);
-
+    case REDUCER_ACTION_TYEP.AUTHORIZE:
+      const token = action?.payload?.token || state?.token || localStorage.getItem("token") || ''; // Provide a default empty string
+      const role = action?.payload?.isAdmin ? ROLES.ADMIN : ROLES.USER;
+      localStorage.setItem("token",token);
+      localStorage.setItem("role",role);
+      localStorage.setItem("isAuth","true");
+      localStorage.setItem("user",JSON.stringify(action.payload));
       return {
-        ...state,
         isAuth: true,
-        user: action.payload.user,
+        user: action.payload,
         token: token,
         role: role,
         isLoading: false,
-      };
-      
-    case AUTH_ACTIONS.LOGOUT:
-      localStorage.removeItem("role");
-      localStorage.removeItem("token");
-      return {
-        user: null,
-        isAuth: false,
-        token: null, // Reset the token to null
-        role: getRole(),
         error: null,
+      };
+
+    case REDUCER_ACTION_TYEP.LOGOUT:
+      ["token","user","role","isAuth"].forEach((item) =>
+        localStorage.removeItem(item)
+      );
+      return {
+        isAuth: false,
+        user: null,
+        token: '',
+        role: ROLES.GUEST,
+        isLoading: false,
+        error: null,
+      };
+
+    case REDUCER_ACTION_TYEP.SET_ERROR:
+      return {
+        ...state, // Keep the existing state properties
+        error: action.payload,
         isLoading: false,
       };
 
@@ -81,21 +94,68 @@ const authReducer = (state: any, action: any) => {
 };
 
 const useAuth = () => {
-  const [state, dispatch] = useReducer(authReducer, INIT_STATE);
+  const [state,dispatch] = useReducer(reduce,initialState);
+  const token = (state.token || localStorage.getItem('token') || '') as string; // Provide a default empty string
+  const config = { headers: { Authorization: `Bearer ${token}` } };
 
-  const handleAUTHENTICATE = async (endPoint: any, body: any) => {
+  const router = useRouter();
+
+  // Login
+  const login = async (body: Record<string,any>) => {
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING });
     try {
-      dispatch({ type: AUTH_ACTIONS.SET_LOADING });
-      const { data } = await axios.post(AUTH_API_URL + endPoint, body);
-      dispatch({ type: AUTH_ACTIONS.AUTHORIZE, payload: data });
-    } catch (error: any) {
-      dispatch({ type: AUTH_ACTIONS.SET_ERROR, payload: error.message });
+      const { data } = await axios.post(AUTH_API_URL + AUTH_API_PATHS.LOGIN,body);
+      dispatch({ type: AUTH_ACTIONS.AUTHORIZE,payload: data?.data || data });
+      Swal.fire({
+        icon: "success",
+        title: 'Logged in Successfully',
+        showConfirmButton: false,
+        timer: 2000
+      });
+      router.replace(PATHS.HOME);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: 'The data is incorrect!',
+        showConfirmButton: false,
+        timer: 2000
+      });
+      const errorMessage = (error as Error).message; // Use 'as' to assert the type of error
+      dispatch({ type: AUTH_ACTIONS.SET_ERROR,payload: errorMessage });
     }
   };
 
-  const logout = () => dispatch({ type: AUTH_ACTIONS.LOGOUT });
+  // Signup
+  const signup = async (body: Record<string,any>) => {
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING });
+    try {
+      const { data } = await axios.post(AUTH_API_URL + AUTH_API_PATHS.SIGNUP,body);
+      dispatch({ type: AUTH_ACTIONS.AUTHORIZE,payload: data?.data || data });
+      Swal.fire({
+        icon: "success",
+        title: 'Registered Successfully',
+        showConfirmButton: false,
+        timer: 2000
+      });
+      router.replace(PATHS.LOGIN);
+    } catch (error) {
+      const errorMessage = (error as Error).message; // Use 'as' to assert the type of error
+      dispatch({ type: AUTH_ACTIONS.SET_ERROR,payload: errorMessage });
+    }
+  };
 
-  return { ...state, handleAUTHENTICATE, logout };
+  // Logout
+  const logout = () => {
+    dispatch({ type: AUTH_ACTIONS.LOGOUT });
+    router.replace(PATHS.LOGIN);
+  };
+
+  return {
+    ...state,
+    login,
+    signup,
+    logout,
+  };
 };
 
 export default useAuth;

@@ -17,6 +17,7 @@ type InputProps = {
   value?: string;
   onClick?: () => void;
   register?: {name: string};
+  defaultValue?: string
 }
 
 const Input = ({
@@ -31,6 +32,7 @@ const Input = ({
   removeArrow = false,
   name,
   value,
+  defaultValue="",
   onClick,
   register = {name: ""},
 }: InputProps) => {
@@ -52,6 +54,7 @@ const Input = ({
           type={type}
           placeholder={placeholder}
           value={value}
+          defaultValue={defaultValue}
           onChange={onChange}
           onClick={() => onClick}
           id={name}
